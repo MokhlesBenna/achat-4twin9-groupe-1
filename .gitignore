@@ -63,3 +63,4 @@ replay_pid*
 
 # ⚠️ Don't ignore docker-compose.yml!
 
+.scannerwork/

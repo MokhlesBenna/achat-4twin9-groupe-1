@@ -1,17 +1,21 @@
-# Stage 1: Build the Angular app
-FROM node:18 as build
+# Stage 1: Build Angular app (Optional if already built with ng build)
+# FROM node:18-alpine AS builder
+# WORKDIR /app
+# COPY . .
+# RUN npm install
+# RUN npm run build -- --configuration production
 
-WORKDIR /app
-COPY . .
-RUN npm install --legacy-peer-deps
-RUN npm run build -- --configuration=production
+# Stage 2: Serve with nginx
+FROM nginx:alpine
 
-# Stage 2: Serve the Angular app with http-server
-FROM node:18
+# Remove default nginx static files
+RUN rm -rf /usr/share/nginx/html/*
 
-RUN npm install -g http-server
-WORKDIR /app
-COPY --from=build /app/dist/achat-frontend .
+# Copy the built Angular app (adjust path if needed)
+COPY dist/achat-frontend /usr/share/nginx/html
 
-EXPOSE 8080
-CMD ["http-server", "-p", "8080"]
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
