@@ -3,21 +3,17 @@ FROM maven:3.8.5-openjdk-17 AS build
 
 WORKDIR /app
 
-# Copy everything
+# Copy the entire backend project into the container
 COPY . .
 
-# ✅ Make mvnw executable inside the container
-RUN chmod +x mvnw
+# 🛠 Explicitly give execution rights to mvnw
+RUN chmod +x mvnw && ./mvnw clean install -DskipTests
 
-# Run Maven build (skip tests)
-RUN ./mvnw clean install -DskipTests
-
-# Stage 2: Use a lightweight JDK base image for running the app
+# Stage 2: Run with a lightweight JDK
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-# Copy the built JAR file from the previous stage
 COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
